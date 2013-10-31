@@ -64,17 +64,17 @@ class Checkers_Board
 
 
 
-  def perform_slide(piece)
+  def perform_slide(piece, slide_to)
     x, y = piece.pos
     slides = piece.slide_moves
-    puts "Please slide to one of the following positions:"
-    p slides
-    to_slide = gets.chomp.split(' ').map(&:to_i)
-    unless slides.include?(to_slide)
-      puts "Invalid Move"
-      return
-    end
-    newx, newy = to_slide
+    # puts "Please slide to one of the following positions:"
+#     p slides
+    # to_slide = gets.chomp.split(' ').map(&:to_i)
+    # unless slides.include?(to_slide)
+ #      puts "Invalid Move"
+ #      return
+ #    end
+    newx, newy = slide_to
     #empty the board at the destination and copy the sliding piece there.
     self.board[newx][newy] = nil
     self.board[newx][newy] = piece
@@ -87,18 +87,18 @@ class Checkers_Board
   end
 
 
-  def perform_jump(piece)
+  def perform_jump(piece, jump_to)
     x, y = piece.pos
-    debugger
+    # debugger
     jumps = piece.jump_moves
-    puts "Please jump to one of the following positions:"
-    p jumps
-    to_jump = gets.chomp.split(' ').map(&:to_i)
-    unless jumps.include?(to_jump)
-      puts "Invalid Move"
-      return
-    end
-    newx, newy = to_jump
+    # puts "Please jump to one of the following positions:"
+   #  p jumps
+   #  to_jump = gets.chomp.split(' ').map(&:to_i)
+    # unless jumps.include?(to_jump)
+#       puts "Invalid Move"
+#       return
+#     end
+    newx, newy = jump_tp
     #empty the board at the destination and copy the jumping piece there.
     self.board[newx][newy] = nil
     self.board[newx][newy] = piece
@@ -110,6 +110,8 @@ class Checkers_Board
     jumpedx, jumpedy = (x + newx)/2, (y + newy)/2
     self.board[jumpedx][jumpedy] = nil
     print_board
+    puts "Press any key to continue"
+    gets.chomp
   end
 
 

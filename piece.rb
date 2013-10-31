@@ -1,3 +1,4 @@
+require 'debugger'
 require_relative 'checkers_board'
 
 class Piece
@@ -5,12 +6,11 @@ class Piece
   attr_reader :color, :board
   attr_accessor :type, :jumped, :pos
 
-  def initialize(board, pos, color, type, jumped=false)
+  def initialize(board, pos, color, type)
     @board = board
     @pos = pos
-    @color = color
-    @type = type
-    @jumped = jumped
+    @color = color #:Y or :R
+    @type = type #king or pawn
   end
 
 
@@ -93,6 +93,160 @@ class Piece
     jump_locations
   end
 
+  def get_dupped_board
+    duplicate_game = Checkers_Board.new
+    duplicate_board = duplicate_game.board
+
+    self.board.each_with_index do |el1, i|
+      el1.each_with_index do |el2, j|
+        original_piece = self.board[i][j]
+        duplicate_piece = Piece.new(duplicate_board, original_piece.pos.dup,
+                original_piece.color, original_piece.type)
+        duplicate_board[i][j] = duplicate_piece
+      end
+    end
+    duplicate_board
+  end
+
+  end
+
+
+  def perform_moves(move_sequence)
+    if valid_move_seq?(move_sequence)
+      perform_moves!(move_sequence)
+    else
+      raise ArgumentError.new("InvalidMoveError")
+    end
+  end
+
+
+  def valid_moves_seq?(move_sequence)
+    x, y = self.pos
+    duplicate_board = get_dupped_board
+    duplicate_self = duplicate_board[x][y]
+
+    begin
+      duplicate_self.perform_moves!(move_sequence)
+    rescue ArgumentError
+       return false
+    end
+      return true
+
+  end
+
+
+
+  def perform_moves!(move_sequence)
+
+    move_sequence.each do |move_to|
+      possible_slides = slide_moves
+      possible_jumps = jump_moves
+
+      unless possible_slides.include?(move_to) || possible_jumps.include?(move_to)
+        raise ArgumentError.new("InvalidMoveError")
+      end
+
+      if possible_slides.include?(move_to)
+        perform_slide(move_to)
+      else
+        perform_jump(move_to)
+      end
+    end
+
+  end
+
+  def perform_slide(slide_to)
+    x, y = self.pos
+    # slides = slide_moves
+    # puts "Please slide to one of the following positions:"
+#     p slides
+    # to_slide = gets.chomp.split(' ').map(&:to_i)
+    # unless slides.include?(to_slide)
+ #      puts "Invalid Move"
+ #      return
+ #    end
+    newx, newy = slide_to
+    #empty the board at the destination and copy the sliding piece there.
+    self.board[newx][newy] = nil
+    self.board[newx][newy] = self
+    #remove the sliding piece from the original location
+    self.board[x][y] = nil
+    #set the piece's internal position pointer to reflect its new position
+    self.pos = [newx, newy]
+    print_board
+    puts "Press return to continue"
+    gets.chomp
+
+  end
+
+  def perform_jump(jump_to)
+    x, y = self.pos
+     # debugger
+    # jumps = jump_moves
+    # puts "Please jump to one of the following positions:"
+   #  p jumps
+   #  to_jump = gets.chomp.split(' ').map(&:to_i)
+    # unless jumps.include?(to_jump)
+#       puts "Invalid Move"
+#       return
+#     end
+    newx, newy = jump_to
+    #empty the board at the destination and copy the jumping piece there.
+    self.board[newx][newy] = nil
+    self.board[newx][newy] = self
+    #remove the jumping piece from the original location
+    self.board[x][y] = nil
+    #set the piece's internal position pointer to reflect its new position
+    self.pos = [newx, newy]
+    #remove the piece that was jumped over from the board
+    jumpedx, jumpedy = (x + newx)/2, (y + newy)/2
+    self.board[jumpedx][jumpedy] = nil
+    print_board
+    puts "Press enter to continue"
+    gets.chomp
+  end
+
+
+
+
+
+
+
+  def print_board
+    self.board.each_with_index do |el1, i|
+        el1.each_with_index do |el2, j|
+          piece = self.board[i][j]
+       if piece.nil?
+         if (i+j) % 2 == 0
+            print '   '.bg_cyan
+         else
+            print '   '.bg_red
+         end
+       elsif piece.color == :Y
+          print ' Y '.brown.bg_red
+       else
+          print ' R '.red.bg_gray
+       end
+     end
+      print "\n"
+    end
+    print "\n\n\n"
+
+    nil
+
+  end
+
+
+
+
+
+
+
+
+
+
+
+
 
 end
 
@@ -103,16 +257,12 @@ end
 if $PROGRAM_NAME == __FILE__
   load 'piece.rb'
   b = Checkers_Board.new
-  b.print_board
-  piece = b.board[2][1]
-  p piece.get_valid_moves(1)
-  b.perform_slide(piece)
-
-  b.perform_slide(piece)
-
-  newpiece= b.board[5][0]
-  newpiece.pos
-  b.perform_jump(newpiece)
+  piece0 = b.board[5][2]
+  piece0.perform_moves( [ [4, 3], [3, 1] ] )
+  piece1= b.board[6][1]
+  piece1.perform_moves([ [5, 2] ])
+  piece3 = b.board[2][1]
+  piece3.perform_moves([ [4, 3], [6, 1] ])
   #p = Pawn.new(b, [5, 6], :W)
   # board.checked?(:W)
 end
