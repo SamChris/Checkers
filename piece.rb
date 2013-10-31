@@ -1,5 +1,7 @@
+# encoding: UTF-8
 require 'debugger'
 require_relative 'checkers_board'
+require 'colorize'
 
 class Piece
 
@@ -100,19 +102,22 @@ class Piece
     self.board.each_with_index do |el1, i|
       el1.each_with_index do |el2, j|
         original_piece = self.board[i][j]
+        if self.board[i][j].nil?
+          duplicate_board[i][j] = nil
+          next
+        end
         duplicate_piece = Piece.new(duplicate_board, original_piece.pos.dup,
                 original_piece.color, original_piece.type)
         duplicate_board[i][j] = duplicate_piece
       end
     end
     duplicate_board
-  end
 
   end
 
 
   def perform_moves(move_sequence)
-    if valid_move_seq?(move_sequence)
+    if valid_moves_seq?(move_sequence)
       perform_moves!(move_sequence)
     else
       raise ArgumentError.new("InvalidMoveError")
@@ -126,6 +131,7 @@ class Piece
     duplicate_self = duplicate_board[x][y]
 
     begin
+      # debugger
       duplicate_self.perform_moves!(move_sequence)
     rescue ArgumentError
        return false
@@ -218,14 +224,14 @@ class Piece
           piece = self.board[i][j]
        if piece.nil?
          if (i+j) % 2 == 0
-            print '   '.bg_cyan
+            print '   '.colorize(:background => :white)
          else
-            print '   '.bg_red
+            print '   '.colorize(:background => :yellow)
          end
        elsif piece.color == :Y
-          print ' Y '.brown.bg_red
+          print ' ⬭ '.colorize(:color => :red, :background => :yellow)
        else
-          print ' R '.red.bg_gray
+          print ' ⬭ '.colorize(:color => :black, :background => :yellow)
        end
      end
       print "\n"
@@ -236,19 +242,36 @@ class Piece
 
   end
 
-
-
-
-
-
-
-
-
-
-
-
-
 end
+
+
+
+class String
+  def black;          "\033[30m#{self}\033[0m" end
+  def red;            "\033[31m#{self}\033[0m" end
+  def green;          "\033[32m#{self}\033[0m" end
+  def  brown;         "\033[33m#{self}\033[0m" end
+  def blue;           "\033[34m#{self}\033[0m" end
+  def magenta;        "\033[35m#{self}\033[0m" end
+  def cyan;           "\033[36m#{self}\033[0m" end
+  def gray;           "\033[37m#{self}\033[0m" end
+  def bg_black;       "\033[40m#{self}\0330m"  end
+  def bg_red;         "\033[41m#{self}\033[0m" end
+  def bg_green;       "\033[42m#{self}\033[0m" end
+  def bg_brown;       "\033[43m#{self}\033[0m" end
+  def bg_blue;        "\033[44m#{self}\033[0m" end
+  def bg_magenta;     "\033[45m#{self}\033[0m" end
+  def bg_cyan;        "\033[46m#{self}\033[0m" end
+  def bg_gray;        "\033[47m#{self}\033[0m" end
+  def bold;           "\033[1m#{self}\033[22m" end
+  def reverse_color;  "\033[7m#{self}\033[27m" end
+end
+
+
+
+
+
+
 
 
 
@@ -258,11 +281,11 @@ if $PROGRAM_NAME == __FILE__
   load 'piece.rb'
   b = Checkers_Board.new
   piece0 = b.board[5][2]
-  piece0.perform_moves( [ [4, 3], [3, 1] ] )
+  piece0.perform_moves( [ [4, 3] ])
   piece1= b.board[6][1]
   piece1.perform_moves([ [5, 2] ])
   piece3 = b.board[2][1]
-  piece3.perform_moves([ [4, 3], [6, 1] ])
+  piece3.perform_moves([ [3, 2], [4, 3] ])
   #p = Pawn.new(b, [5, 6], :W)
   # board.checked?(:W)
 end

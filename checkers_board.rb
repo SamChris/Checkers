@@ -1,5 +1,5 @@
-# encoding: UTF-8
 require 'debugger'
+
 
 
 class Checkers_Board
@@ -40,51 +40,10 @@ class Checkers_Board
   end
 
 
-  def print_board
-    self.board.each_with_index do |el1, i|
-        el1.each_with_index do |el2, j|
-          piece = self.board[i][j]
-       if piece.nil?
-         if (i+j) % 2 == 0
-            print '   '.bg_cyan
-         else
-            print '   '.bg_red
-         end
-       elsif piece.color == :Y
-          print ' Y '.brown.bg_red
-       else
-          print ' R '.red.bg_gray
-       end
-     end
-      print "\n"
-    end
-    nil
-
-  end
 
 
 
-  def perform_slide(piece, slide_to)
-    x, y = piece.pos
-    slides = piece.slide_moves
-    # puts "Please slide to one of the following positions:"
-#     p slides
-    # to_slide = gets.chomp.split(' ').map(&:to_i)
-    # unless slides.include?(to_slide)
- #      puts "Invalid Move"
- #      return
- #    end
-    newx, newy = slide_to
-    #empty the board at the destination and copy the sliding piece there.
-    self.board[newx][newy] = nil
-    self.board[newx][newy] = piece
-    #remove the sliding piece from the original location
-    self.board[x][y] = nil
-    #set the piece's internal position pointer to reflect its new position
-    piece.pos = [newx, newy]
-    print_board
 
-  end
 
 
   def perform_jump(piece, jump_to)
@@ -119,25 +78,6 @@ end
 
 
 
-class String
-  def black;          "\033[30m#{self}\033[0m" end
-  def red;            "\033[31m#{self}\033[0m" end
-  def green;          "\033[32m#{self}\033[0m" end
-  def  brown;         "\033[33m#{self}\033[0m" end
-  def blue;           "\033[34m#{self}\033[0m" end
-  def magenta;        "\033[35m#{self}\033[0m" end
-  def cyan;           "\033[36m#{self}\033[0m" end
-  def gray;           "\033[37m#{self}\033[0m" end
-  def bg_black;       "\033[40m#{self}\0330m"  end
-  def bg_red;         "\033[41m#{self}\033[0m" end
-  def bg_green;       "\033[42m#{self}\033[0m" end
-  def bg_brown;       "\033[43m#{self}\033[0m" end
-  def bg_blue;        "\033[44m#{self}\033[0m" end
-  def bg_magenta;     "\033[45m#{self}\033[0m" end
-  def bg_cyan;        "\033[46m#{self}\033[0m" end
-  def bg_gray;        "\033[47m#{self}\033[0m" end
-  def bold;           "\033[1m#{self}\033[22m" end
-  def reverse_color;  "\033[7m#{self}\033[27m" end
-end
+
 
 
