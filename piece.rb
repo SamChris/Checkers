@@ -12,7 +12,7 @@ class Piece
     @board = board
     @pos = pos
     @color = color #:Y or :R
-    @type = type #king or pawn
+    @type = type #:S or :K
   end
 
 
@@ -29,8 +29,11 @@ class Piece
 
 
   def slide_moves
-   self.color == :Y ? dir = 1 : dir = -1
+    self.color == :Y ? dir = 1 : dir = -1
     all_on_board_moves = get_valid_moves(dir)
+
+    all_on_board_moves += get_valid_moves(dir*-1) if self.type == :K
+
     places_to_slide = purge_occupied(all_on_board_moves)
   end
 
@@ -49,6 +52,9 @@ class Piece
   def jump_moves
     self.color == :Y ? dir = 1 : dir = -1
     all_on_board_moves = get_valid_moves(dir)
+
+    all_on_board_moves += get_valid_moves(dir*-1) if self.type == :K
+
     places_to_jump = gather_possible_jumps(all_on_board_moves)
   end
 
@@ -122,6 +128,15 @@ class Piece
     else
       raise ArgumentError.new("InvalidMoveError")
     end
+
+    if self.type == :S && self.color == :Y && self.pos[0] == 7
+      self.type == :K
+    end
+
+    if self.type == :S && self.color == :R && self.pos[0] == 0
+      self.type == :K
+    end
+
   end
 
 
@@ -180,7 +195,7 @@ class Piece
     #set the piece's internal position pointer to reflect its new position
     self.pos = [newx, newy]
     print_board
-    puts "Press return to continue"
+    puts "Press enter to continue"
     gets.chomp
 
   end
@@ -229,9 +244,17 @@ class Piece
             print '   '.colorize(:background => :yellow)
          end
        elsif piece.color == :Y
-          print ' ⬭ '.colorize(:color => :red, :background => :yellow)
+          if piece.type == :S
+              print ' ⬭ '.colorize(:color => :red, :background => :yellow)
+          else
+              print ' ♔ '.colorize(:color => :red, :background => :yellow)
+          end
        else
+         if piece.type == :S
           print ' ⬭ '.colorize(:color => :black, :background => :yellow)
+         else
+          print ' ♚ '.colorize(:color => :black, :background => :yellow)
+         end
        end
      end
       print "\n"
