@@ -1,5 +1,5 @@
 # encoding: UTF-8
-
+require 'debugger'
 
 
 class Checkers_Board
@@ -9,7 +9,7 @@ class Checkers_Board
   def initialize
     @board = Array.new(8){Array.new(8)}
       set_up_board
-  end
+    end
 
   def set_up_board
     set_up_top
@@ -67,7 +67,7 @@ class Checkers_Board
   def perform_slide(piece)
     x, y = piece.pos
     slides = piece.slide_moves
-    puts "Please slide in one of the following directions:"
+    puts "Please slide to one of the following positions:"
     p slides
     to_slide = gets.chomp.split(' ').map(&:to_i)
     unless slides.include?(to_slide)
@@ -82,10 +82,35 @@ class Checkers_Board
     self.board[x][y] = nil
     #set the piece's internal position pointer to reflect its new position
     piece.pos = [newx, newy]
+    print_board
 
   end
 
 
+  def perform_jump(piece)
+    x, y = piece.pos
+    debugger
+    jumps = piece.jump_moves
+    puts "Please jump to one of the following positions:"
+    p jumps
+    to_jump = gets.chomp.split(' ').map(&:to_i)
+    unless jumps.include?(to_jump)
+      puts "Invalid Move"
+      return
+    end
+    newx, newy = to_jump
+    #empty the board at the destination and copy the jumping piece there.
+    self.board[newx][newy] = nil
+    self.board[newx][newy] = piece
+    #remove the jumping piece from the original location
+    self.board[x][y] = nil
+    #set the piece's internal position pointer to reflect its new position
+    piece.pos = [newx, newy]
+    #remove the piece that was jumped over from the board
+    jumpedx, jumpedy = (x + newx)/2, (y + newy)/2
+    self.board[jumpedx][jumpedy] = nil
+    print_board
+  end
 
 
 end

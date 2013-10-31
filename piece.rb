@@ -41,28 +41,33 @@ class Piece
     purged_moves
   end
 
+
+
+
   def jump_moves
     self.color == :Y ? dir = 1 : dir = -1
     all_on_board_moves = get_valid_moves(dir)
-
     places_to_jump = gather_possible_jumps(all_on_board_moves)
   end
 
 
 
 
-  def gather_possible_jumps(dir)
+  def gather_possible_jumps(all_on_board_moves)
     enemy_locations = gather_my_enemies(all_on_board_moves)
     possible_jump_locations = get_possible_jumps(enemy_locations)
     jump_locations = get_jump_locations(possible_jump_locations)
+    jump_locations
   end
 
   def gather_my_enemies(valid_locations)
     enemy_locations = []
-    enemy_locations << valid_locations.select do |location|
+    enemy_locations = valid_locations.select do |location|
       x, y = location
-      !self.board[x][y].nil? && self.board[x][y].color!=self.color
+      next if self.board[x][y].nil?
+      self.board[x][y].color!=self.color
     end
+
     enemy_locations
   end
 
@@ -70,20 +75,22 @@ class Piece
     possible_jumps = []
     x, y = self.pos
     enemy_locations.each do |location|
-      enemy_x, enemy_y = location
-      dif_x, dif_y = enemy_x - x, enemy_y - y
-      jump_x, jump_y = enemy_x + dif_x, enemy_y + dif_y
+      enemyx, enemyy = location
+      difx, dify = enemyx - x, enemyy - y
+      jumpx, jumpy = enemyx + difx, enemyy + dify
 
-      possible_jumps << [jump_x, jump_y] if jump_x.between?(0,7) && jump_y.between?(0,7)
+      possible_jumps << [jumpx, jumpy] if jumpx.between?(0,7) && jumpy.between?(0,7)
     end
+    possible_jumps
   end
 
 
   def get_jump_locations(possible_jump_locations)
-    possible_jump_locations.select do |possible_jump|
+    jump_locations = possible_jump_locations.select do |possible_jump|
       x, y = possible_jump
       self.board[x][y].nil?
     end
+    jump_locations
   end
 
 
@@ -99,7 +106,13 @@ if $PROGRAM_NAME == __FILE__
   b.print_board
   piece = b.board[2][1]
   p piece.get_valid_moves(1)
+  b.perform_slide(piece)
 
+  b.perform_slide(piece)
+
+  newpiece= b.board[5][0]
+  newpiece.pos
+  b.perform_jump(newpiece)
   #p = Pawn.new(b, [5, 6], :W)
   # board.checked?(:W)
 end
