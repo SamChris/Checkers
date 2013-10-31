@@ -1,5 +1,5 @@
 # encoding: UTF-8
-require "./piece"
+
 
 
 class Checkers_Board
@@ -21,7 +21,7 @@ class Checkers_Board
       0.upto(7) do |j|
         next if (i + j) % 2 == 0
         loc = [i, j]
-        @board[i][j] = Piece.new(loc, :Y, :S)
+        @board[i][j] = Piece.new(self.board, loc, :Y, :S)
       end
     end
     nil
@@ -33,7 +33,7 @@ class Checkers_Board
       0.upto(7) do |j|
         next if (i + j) % 2 == 0
         loc = [i, j]
-        @board[i][j] = Piece.new(loc, :R, :S)
+        @board[i][j] = Piece.new(self.board, loc, :R, :S)
       end
     end
     nil
@@ -41,17 +41,51 @@ class Checkers_Board
 
 
   def print_board
-    0.upto(7) do |i|
-      0.upto(7) do |j|
-        if @board[i][j]
-          print 'P '
-        else
-          print 'X '
-        end
-      end
+    self.board.each_with_index do |el1, i|
+        el1.each_with_index do |el2, j|
+          piece = self.board[i][j]
+       if piece.nil?
+         if (i+j) % 2 == 0
+            print '   '.bg_cyan
+         else
+            print '   '.bg_red
+         end
+       elsif piece.color == :Y
+          print ' Y '.brown.bg_red
+       else
+          print ' R '.red.bg_gray
+       end
+     end
       print "\n"
     end
+    nil
+
   end
+
+
+
+  def perform_slide(piece)
+    x, y = piece.pos
+    slides = piece.slide_moves
+    puts "Please slide in one of the following directions:"
+    p slides
+    to_slide = gets.chomp.split(' ').map(&:to_i)
+    unless slides.include?(to_slide)
+      puts "Invalid Move"
+      return
+    end
+    newx, newy = to_slide
+    #empty the board at the destination and copy the sliding piece there.
+    self.board[newx][newy] = nil
+    self.board[newx][newy] = piece
+    #remove the sliding piece from the original location
+    self.board[x][y] = nil
+    #set the piece's internal position pointer to reflect its new position
+    piece.pos = [newx, newy]
+
+  end
+
+
 
 
 end
