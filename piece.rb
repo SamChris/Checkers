@@ -3,6 +3,9 @@ require 'debugger'
 require_relative 'checkers_board'
 require 'colorize'
 
+# REV: I found it hard to read your code. It seems like there are more steps than
+# REV: necessary and that makes it hard for me to follow your thought process.
+
 class Piece
 
   attr_reader :color, :board
@@ -101,6 +104,7 @@ class Piece
     jump_locations
   end
 
+  # REV: the board duplication could be more compact
   def get_dupped_board
     duplicate_game = Checkers_Board.new
     duplicate_board = duplicate_game.board
@@ -129,6 +133,8 @@ class Piece
       raise ArgumentError.new("InvalidMoveError")
     end
 
+    # REV: These are complex conditions, you could have used a boolean to
+    # REV: tell if it's a king or not and then they'd be a bit shorter
     if self.type == :S && self.color == :Y && self.pos[0] == 7
       self.type == :K
     end

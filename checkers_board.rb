@@ -21,6 +21,7 @@ class Checkers_Board
       0.upto(7) do |j|
         next if (i + j) % 2 == 0
         loc = [i, j]
+        # REV: It is not clear what the symbols :Y and :S are
         @board[i][j] = Piece.new(self.board, loc, :Y, :S)
       end
     end
@@ -57,8 +58,12 @@ class Checkers_Board
 #       puts "Invalid Move"
 #       return
 #     end
+    # REV: it looks like below it should be jump_to
     newx, newy = jump_tp
     #empty the board at the destination and copy the jumping piece there.
+
+    # REV: I don't think you should have to set the destination to nil,
+    # REV: doesn't it have to be nil to move there?
     self.board[newx][newy] = nil
     self.board[newx][newy] = piece
     #remove the jumping piece from the original location
